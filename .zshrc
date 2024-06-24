@@ -21,9 +21,10 @@ eval "$(pyenv init -)"
 
 alias pdf='apvlv'
 alias ll='exa --icons -al'
-alias cat='bat'
+# alias cat='bat'
 alias icat="echo && kitten icat"
 alias config="git --git-dir=$HOME/codes/.dotfiles/.git --work-tree=$HOME"
+alias clip="xclip -sel clip"
 
 export PATH=~/.local/bin:$PATH
 
