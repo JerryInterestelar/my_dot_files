@@ -4,7 +4,7 @@ return {
     {
       "<leader>uu",
       vim.cmd.UndotreeToggle,
-      desc = "Toggle Undo Tree UI",
+      desc = "M - Toggle Undo Tree UI",
     },
   },
 }

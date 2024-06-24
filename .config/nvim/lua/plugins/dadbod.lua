@@ -18,7 +18,7 @@ return {
     {
       "<leader>D",
       "<cmd>tabnew<cr><bar><bar><cmd>DBUI<cr>",
-      desc = "Open DadBod - Data Base query",
+      desc = "M - Open DadBod - Data Base query",
     },
   },
 }
