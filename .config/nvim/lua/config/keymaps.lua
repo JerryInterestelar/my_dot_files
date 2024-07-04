@@ -23,4 +23,4 @@ vim.keymap.set(
   { desc = "M - Search for the select word" }
 )
 
-vim.keymap.set("n", "<C-a>", "ggVG<C-0>", { desc = "M - Select All" })
+vim.keymap.set("n", "<C-a>", "ggVG", { desc = "M - Select All" })
