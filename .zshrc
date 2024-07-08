@@ -25,6 +25,8 @@ alias ll='exa --icons -al'
 alias icat="echo && kitten icat"
 alias config="git --git-dir=$HOME/codes/.dotfiles/.git --work-tree=$HOME"
 alias clip="xclip -sel clip"
+alias t2="tree -aC -L 2 -I '.git'"
+alias t3="tree -aC -L 3 -I '.git'"
 
 export PATH=~/.local/bin:$PATH
 
