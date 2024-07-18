@@ -13,6 +13,7 @@ if [[ -e /usr/share/zsh/manjaro-zsh-prompt ]]; then
   source /usr/share/zsh/manjaro-zsh-prompt
 fi
 
+source <(fzf --zsh)
 #pyenv
 #
 export PYENV_ROOT="$HOME/.pyenv"
