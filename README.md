@@ -2,6 +2,6 @@
 Minhas dotfiles usando Fedora
 Utiliza GNU Stow
 
-##Utilização
+## Utilização
 
       stow <nome-da-dotfile>
