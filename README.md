@@ -1,2 +1,7 @@
 # my_dot_files
-Minhas dotfiles usando manjaro com i3
+Minhas dotfiles usando Fedora
+Utiliza GNU Stow
+
+##Utilização
+
+      stow <nome-da-dotfile>
