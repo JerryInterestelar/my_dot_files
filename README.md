@@ -1,6 +1,6 @@
 # my_dot_files
-Minhas dotfiles usando Fedora
-Utiliza GNU Stow
+Minhas dotfiles - Fedora:
+Utiliza GNU Stow para gerenciar os arquivos
 
 ## Utilização
 
