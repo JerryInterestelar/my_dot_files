@@ -1,21 +1,29 @@
+# ==========================================
+# 1. VARIÁVEIS DE AMBIENTE & PATH
+# ==========================================
 export DISABLE_AUTO_TITLE='true'
-# Lines configured by zsh-newuser-install
+export EDITOR=nvim
+export RUST_WITHOUT=rust-docs
+export FLYCTL_INSTALL="$HOME/.fly"
+
+# Configuração Limpa do PATH (adiciona caminhos se existirem)
+typeset -U path PATH # Garante que não haja duplicatas no PATH
+path=(
+  "$HOME/.local/bin"
+  "$HOME/.cargo/bin"
+  "$FLYCTL_INSTALL/bin"
+  "$path[@]"
+)
+export PATH
+
+# ==========================================
+# 2. HISTÓRICO
+# ==========================================
 HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
-## Options section
-setopt correct                                                  # Auto correct mistakes
-setopt extendedglob                                             # Extended globbing. Allows using regular expressions with *
-setopt nocaseglob                                               # Case insensitive globbing
-setopt rcexpandparam                                            # Array expension with parameters
-setopt nocheckjobs                                              # Don't warn about running processes when exiting
-setopt numericglobsort                                          # Sort filenames numerically when it makes sense
-setopt nobeep                                                   # No beep
-setopt appendhistory                                            # Immediately append history instead of overwriting
-setopt histignorealldups                                        # If a new command is a duplicate, remove the older one
-setopt autocd                                                   # if only directory path is entered, cd there.
-setopt inc_append_history                                       # save commands are added to the history immediately, otherwise only when shell exits.
-setopt histignorespace                                          # Don't save commands that start with space
+setopt appendhistory
+setopt inc_append_history
 setopt sharehistory
 setopt hist_ignore_space
 setopt hist_ignore_all_dups
@@ -23,109 +31,130 @@ setopt hist_save_no_dups
 setopt hist_ignore_dups
 setopt hist_find_no_dups
 
-zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' # Case insensitive tab completion
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"                           # Colored completion (different colors for dirs/files/etc)
-zstyle ':completion:*' rehash true                                                # automatically find new executables in path 
-zstyle ':completion:*' menu select                                                # Highlight menu selection
-# Speed up completions
+# ==========================================
+# 3. OPÇÕES DO ZSH (CORE)
+# ==========================================
+setopt correct              # Correção automática de comandos
+setopt extendedglob         # Globbing avançado
+setopt nocaseglob           # Case insensitive globbing
+setopt numericglobsort      # Ordenação numérica de arquivos
+setopt autocd               # Entra na pasta apenas digitando o nome
+setopt nobeep               # Sem bip sonoro
+# Caracteres que fazem parte de uma palavra (para Ctrl+W etc)
+WORDCHARS=${WORDCHARS//\/[&.;]}
+
+# ==========================================
+# 4. PLUGINS & FERRAMENTAS (CARREGAMENTO)
+# ==========================================
+
+# ASDF (Gerenciador de versões) - Carregar antes do completion
+if [[ -f "$HOME/.asdf/asdf.sh" ]]; then
+    . "$HOME/.asdf/asdf.sh"
+    fpath=(${ASDF_DIR}/completions $fpath)
+fi
+
+# Completions (Autocompletar avançado)
+fpath=(~/.zsh/zsh-completions/src $fpath)
+
+autoload -Uz compinit
+local _comp_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
+
+# Cria um array contendo o arquivo APENAS se ele tiver menos de 24h
+# (N.mh-24) significa: Nullglob (não erro se vazio), Arquivo normal (.), modificado < 24h
+local -a _valid_dump
+_valid_dump=( "${_comp_dumpfile}"(N.mh-24) )
+
+if (( $#_valid_dump )); then
+    # O arquivo é recente: Pula a verificação de segurança (RÁPIDO)
+    compinit -C
+else
+    # O arquivo é antigo ou não existe: Roda completo (LENTO)
+    compinit
+    touch "$_comp_dumpfile"
+fi
+
+# Estilização do menu de completion
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' menu select
 zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
 
-WORDCHARS=${WORDCHARS//\/[&.;]}                                 # Don't consider certain characters part of the word
-
-# bindings
-bindkey -e
-bindkey '^[[7~' beginning-of-line                               # Home key
-bindkey '^[[H' beginning-of-line                                # Home key
-if [[ "${terminfo[khome]}" != "" ]]; then
-  bindkey "${terminfo[khome]}" beginning-of-line                # [Home] - Go to beginning of line
-fi
-bindkey '^[[8~' end-of-line                                     # End key
-bindkey '^[[F' end-of-line                                      # End key
-if [[ "${terminfo[kend]}" != "" ]]; then
-  bindkey "${terminfo[kend]}" end-of-line                       # [End] - Go to end of line
-fi
-bindkey '^[[2~' overwrite-mode                                  # Insert key
-bindkey '^[[3~' delete-char                                     # Delete key
-bindkey '^[[C'  forward-char                                    # Right key
-bindkey '^[[D'  backward-char                                   # Left key
-bindkey '^[[5~' history-beginning-search-backward               # Page up key
-bindkey '^[[6~' history-beginning-search-forward                # Page down key
-
-# Navigate words with ctrl+arrow keys
-bindkey '^[Oc' forward-word                                     #
-bindkey '^[Od' backward-word                                    #
-bindkey '^[[1;5D' backward-word                                 #
-bindkey '^[[1;5C' forward-word                                  #
-bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
-bindkey '^[[Z' undo                                             # Shift+tab undo last action
-
-
-# Starship
+# Starship (Prompt)
 eval "$(starship init zsh)"
 
-# Autosuggestions
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-# Completions
-fpath=(~/.zsh/zsh-completions/src $fpath)
-
-# Highlighting
-source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# fzf
+# FZF (Fuzzy Finder)
 eval "$(fzf --zsh)"
 
+# Direnv (Ambientes virtuais automáticos)
+eval "$(direnv hook zsh)"
+
+# ==========================================
+# 5. KEYBINDINGS (ATALHOS)
+# ==========================================
+bindkey -e # Modo Emacs (padrão)
+
+# Navegação Básica (Home/End/Delete/Insert)
+bindkey '^[[7~' beginning-of-line
+bindkey '^[[H'  beginning-of-line
+[[ -n "${terminfo[khome]}" ]] && bindkey "${terminfo[khome]}" beginning-of-line
+
+bindkey '^[[8~' end-of-line
+bindkey '^[[F'  end-of-line
+[[ -n "${terminfo[kend]}" ]] && bindkey "${terminfo[kend]}" end-of-line
+
+bindkey '^[[2~' overwrite-mode
+bindkey '^[[3~' delete-char
+
+# Navegação por Palavras (Ctrl + Setas)
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[Oc'    forward-word
+bindkey '^[Od'    backward-word
+bindkey '^H'      backward-kill-word # Ctrl+Backspace
+
+# Histórico (Page Up/Down)
+bindkey '^[[5~' history-beginning-search-backward
+bindkey '^[[6~' history-beginning-search-forward
+
+# Atalho Shift+Tab (Undo)
+bindkey '^[[Z' undo
+
+# --- MEUS SCRIPTS ---
+# Tmux Sessionizer (Opção 2 - Simulação de digitação)
+# Ajustado para usar hífen (-) conforme criamos o arquivo
+bindkey -s '^y' '^u~/.local/bin/tmux_sessionizer\n'
+
+# ==========================================
+# 6. ALIASES
+# ==========================================
 alias ls='ls --color'
+alias ll='exa --icons -al' # Requer 'exa' instalado. Se não tiver, mude para 'ls -al'
 alias t2="tree -aC -L 2 -I '.git'"
 alias t3="tree -aC -L 3 -I '.git'"
-alias vim="nvim --clean"
-alias ll='exa --icons -al'
-# alias cat='bat'
+
+# IMPORTANTE: Removi o --clean para carregar seu LazyVim corretamente
+alias vim="nvim --clean" 
 alias icat="echo && kitten icat"
 
-# asdf
-. "$HOME/.asdf/asdf.sh"
-# append completions to fpath
-fpath=(${ASDF_DIR}/completions $fpath)
-# initialise completions with ZSH's compinit
-zstyle :compinstall filename '/home/jerry/.zshrc'
-autoload -Uz compinit && compinit
+# ==========================================
+# 7. FUNÇÕES
+# ==========================================
 
-
-export PATH=~/.local/bin:$PATH
-export PATH=~/.cargo/bin:$PATH
-export EDITOR=nvim
-
-export RUST_WITHOUT=rust-docs
-
-# Fly.io
-export FLYCTL_INSTALL="/home/jerry/.fly"
-export PATH="$FLYCTL_INSTALL/bin:$PATH"
-
-# Função para copiar código para IA
+# Copiar código para IA (limpo e otimizado)
 ia_copy() {
-    # Valores padrão
     local target_dir="."
     local ext="py"
 
-    # Lógica inteligente de argumentos
     if [ -d "$1" ] && [ -n "$1" ]; then
-        # Se o 1º argumento é um diretório existente
         target_dir="$1"
-        # Se houver um 2º argumento, ele é a extensão
-        if [ -n "$2" ]; then
-            ext="$2"
-        fi
+        [ -n "$2" ] && ext="$2"
     elif [ -n "$1" ]; then
-        # Se o 1º argumento não é diretório, assumimos que é a extensão
         ext="$1"
     fi
 
     echo "🔍 Buscando arquivos '.$ext' em '$target_dir'..."
-
-    # Executa o find
     find "$target_dir" -type f -name "*.$ext" \
         -not -path '*/venv/*' \
         -not -path '*/.venv/*' \
@@ -140,7 +169,9 @@ ia_copy() {
     echo "✅ Conteúdo copiado para o clipboard!"
 }
 
-eval "$(direnv hook zsh)"
-
-# --- TMUX SESSIONIZER ---
-bindkey -s '^y' '^u~/.local/bin/tmux_sessionizer\n'
+# ==========================================
+# 8. PLUGINS VISUAIS (SEMPRE NO FINAL)
+# ==========================================
+# Syntax Highlighting e Autosuggestions devem ser os últimos a carregar
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
