@@ -1,3 +1,4 @@
+export DISABLE_AUTO_TITLE='true'
 # Lines configured by zsh-newuser-install
 HISTFILE=~/.histfile
 HISTSIZE=10000
@@ -103,3 +104,43 @@ export RUST_WITHOUT=rust-docs
 export FLYCTL_INSTALL="/home/jerry/.fly"
 export PATH="$FLYCTL_INSTALL/bin:$PATH"
 
+# Função para copiar código para IA
+ia_copy() {
+    # Valores padrão
+    local target_dir="."
+    local ext="py"
+
+    # Lógica inteligente de argumentos
+    if [ -d "$1" ] && [ -n "$1" ]; then
+        # Se o 1º argumento é um diretório existente
+        target_dir="$1"
+        # Se houver um 2º argumento, ele é a extensão
+        if [ -n "$2" ]; then
+            ext="$2"
+        fi
+    elif [ -n "$1" ]; then
+        # Se o 1º argumento não é diretório, assumimos que é a extensão
+        ext="$1"
+    fi
+
+    echo "🔍 Buscando arquivos '.$ext' em '$target_dir'..."
+
+    # Executa o find
+    find "$target_dir" -type f -name "*.$ext" \
+        -not -path '*/venv/*' \
+        -not -path '*/.venv/*' \
+        -not -path '*/.git/*' \
+        -not -path '*/__pycache__/*' \
+        -not -path '*/node_modules/*' \
+        ! -name "__init__.$ext" \
+        -exec printf "\n# ARQUIVO: %s\n" {} \; \
+        -exec cat {} \; \
+        | wl-copy
+
+    echo "✅ Conteúdo copiado para o clipboard!"
+}
+
+eval "$(direnv hook zsh)"
+
+# --- TMUX SESSIONIZER ---
+bindkey -s '^y' '^u~/.local/bin/tmux_sessionizer\n'
