@@ -5,12 +5,16 @@ export DISABLE_AUTO_TITLE='true'
 export EDITOR=nvim
 export RUST_WITHOUT=rust-docs
 export FLYCTL_INSTALL="$HOME/.fly"
+export ASDF_DATA_DIR=$HOME/.asdf 
 
 # Configuração Limpa do PATH (adiciona caminhos se existirem)
 typeset -U path PATH # Garante que não haja duplicatas no PATH
 path=(
   "$HOME/.local/bin"
   "$HOME/.cargo/bin"
+  "$HOME/go/bin"
+  "$ASDF_DATA_DIR/bin"
+  "$ASDF_DATA_DIR/shims"
   "$FLYCTL_INSTALL/bin"
   "$path[@]"
 )
@@ -47,28 +51,24 @@ WORDCHARS=${WORDCHARS//\/[&.;]}
 # 4. PLUGINS & FERRAMENTAS (CARREGAMENTO)
 # ==========================================
 
-# ASDF (Gerenciador de versões) - Carregar antes do completion
-if [[ -f "$HOME/.asdf/asdf.sh" ]]; then
-    . "$HOME/.asdf/asdf.sh"
-    fpath=(${ASDF_DIR}/completions $fpath)
-fi
-
-# Completions (Autocompletar avançado)
-fpath=(~/.zsh/zsh-completions/src $fpath)
+# Configuração do FPATH
+# Prioridade: 1. Seus completions manuais > 2. Plugins da comunidade > 3. Sistema
+fpath=(
+  "$HOME/.zsh/my-completions"
+  "$HOME/.zsh/zsh-completions/src"
+  $fpath
+)
 
 autoload -Uz compinit
 local _comp_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
 
-# Cria um array contendo o arquivo APENAS se ele tiver menos de 24h
-# (N.mh-24) significa: Nullglob (não erro se vazio), Arquivo normal (.), modificado < 24h
+# Verifica cache (performance)
 local -a _valid_dump
 _valid_dump=( "${_comp_dumpfile}"(N.mh-24) )
 
 if (( $#_valid_dump )); then
-    # O arquivo é recente: Pula a verificação de segurança (RÁPIDO)
     compinit -C
 else
-    # O arquivo é antigo ou não existe: Roda completo (LENTO)
     compinit
     touch "$_comp_dumpfile"
 fi
