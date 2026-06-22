@@ -1,0 +1,28 @@
+# --- Backups e Arquivos Temporários de Editores ---
+*.bak
+*.swp
+*~
+.DS_Store
+
+# --- ZSH Cache e Histórico ---
+# Bloqueia caches locais sem perder suas funções ou aliases customizados
+**/zsh/.zsh/cache/
+**/zsh/.zcompdump*
+.zsh_history
+
+# --- Neovim / Plugins ---
+# Bloqueia o arquivo de trava do Lazy se você prefere atualizar os plugins manualmente em cada máquina.
+# Se você quer garantir a EXATA mesma versão de plugin em todo lugar, remova a linha abaixo.
+**/nvim/.config/nvim/lazy-lock.json
+
+# --- Kitty Terminal ---
+# Ignora o tema selecionado via CLI (geralmente gerado dinamicamente pelo `kitty +kitten themes`)
+**/kitty/.config/kitty/current-theme.conf
+
+# --- Python / Ambientes Virtuais ---
+# Caso crie venvs ou caches de linters/formatadores dentro do bin ou nvim
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

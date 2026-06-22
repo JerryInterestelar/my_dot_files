@@ -1,15 +1,14 @@
 return {
-  -- 1. Configuração dos Servidores LSP (Inteligência de Código)
+  -- 1. Configuração dos Servidores LSP
   {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        -- PYRIGHT: Foca na análise de tipos e definições
         pyright = {
           settings = {
             python = {
               analysis = {
-                typeCheckingMode = "basic", -- "off", "basic" ou "strict"
+                typeCheckingMode = "basic",
                 autoSearchPaths = true,
                 useLibraryCodeForTypes = true,
                 diagnosticMode = "openFilesOnly",
@@ -17,28 +16,26 @@ return {
             },
           },
         },
-
-        -- RUFF: Foca em Linter (Erros de estilo) e correções rápidas
+        -- O ruff aceita configurações nativas aqui.
+        -- Desabilitamos o hover diretamente nas capacidades dele, sem precisar de ganchos (hooks).
         ruff = {
-          -- O ruff lsp geralmente não precisa de configs extras aqui.
-          -- Ele vai ler seu arquivo 'pyproject.toml' ou 'ruff.toml' se existir.
-          -- Caso não exista config no projeto, ele usa os padrões (PEP8).
+          on_init = function(client)
+            if client.name == "ruff" then
+              -- Desabilita o hover do ruff para priorizar o pyright
+              client.server_capabilities.hoverProvider = false
+            end
+          end,
         },
       },
     },
   },
 
-  -- 2. Configuração do Formatador (Para formatar ao salvar)
-  -- O LazyVim usa o plugin 'conform.nvim' para formatação.
+  -- 2. Configuração do Formatador
   {
     "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
-        -- Define que arquivos Python devem ser formatados pelo Ruff
-        python = {
-          "ruff_format",
-          -- "ruff_fix" -- Não quero deletar nada
-        },
+        python = { "ruff_format" },
       },
     },
   },

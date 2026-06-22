@@ -8,9 +8,8 @@ get_projects() {
   find \
     $DIR/javascript \
     $DIR/python/projetos \
-    $DIR/python/games \
-    $DIR/my_dot_files \
-    -mindepth 1 -maxdepth 1 -type d 2>/dev/null
+    $DIR/rust \
+    -mindepth 1 -maxdepth 2 -type d 2>/dev/null
   # 2. Projetos "Soltos": Pastas que já são o projeto em si
   # Adicione aqui pastas específicas que não seguem o padrão acima
   echo "$DIR/python/mangacafe"

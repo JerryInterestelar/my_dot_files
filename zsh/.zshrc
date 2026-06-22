@@ -1,3 +1,5 @@
+#Medidor de performance
+#zmodload zsh/zprof
 # ==========================================
 # 1. VARIÁVEIS DE AMBIENTE & PATH
 # ==========================================
@@ -88,7 +90,7 @@ eval "$(starship init zsh)"
 eval "$(fzf --zsh)"
 
 # Direnv (Ambientes virtuais automáticos)
-eval "$(direnv hook zsh)"
+#eval "$(direnv hook zsh)"
 
 # ==========================================
 # 5. KEYBINDINGS (ATALHOS)
@@ -175,3 +177,5 @@ ia_copy() {
 # Syntax Highlighting e Autosuggestions devem ser os últimos a carregar
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#Medidor de performance - FIM
+#zprof

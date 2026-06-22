@@ -2,9 +2,10 @@ return {
   "mbbill/undotree",
   keys = {
     {
-      "<leader>uu",
-      vim.cmd.UndotreeToggle,
-      desc = "M - Toggle Undo Tree UI",
+      -- Mudou de <leader>uu para <leader>mu (Meus -> Undo Tree)
+      "<leader>mu",
+      "<cmd>UndotreeToggle<cr>",
+      desc = "Alternar Árvore de Undo",
     },
   },
 }
