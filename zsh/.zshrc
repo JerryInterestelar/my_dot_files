@@ -144,26 +144,37 @@ alias icat="echo && kitten icat"
 # 7. FUNÇÕES
 # ==========================================
 
-# Copiar código para IA (limpo e otimizado)
+# Copiar código para IA (limpo, otimizado e multi-extensão)
 ia_copy() {
     local target_dir="."
     local ext="py"
 
-    if [ -d "$1" ] && [ -n "$1" ]; then
+    # Se o primeiro argumento for um diretório válido
+    if [ -d "$1" ]; then
         target_dir="$1"
-        [ -n "$2" ] && ext="$2"
+        # Se houver um segundo argumento, ele será a extensão
+        if [ -n "$2" ]; then
+            ext="$2"
+        fi
+    # Se o primeiro argumento for passado mas NÃO for um diretório, assume-se que é a extensão
     elif [ -n "$1" ]; then
         ext="$1"
     fi
 
-    echo "🔍 Buscando arquivos '.$ext' em '$target_dir'..."
+    # Remove o ponto inicial da extensão caso o usuário digite ".py" em vez de "py"
+    ext="${ext#.}"
+
+    echo "🔍 Buscando arquivos '*.$ext' em '$target_dir'..."
+
+    # Monta o comando find tratando exclusões globais comuns
     find "$target_dir" -type f -name "*.$ext" \
         -not -path '*/venv/*' \
         -not -path '*/.venv/*' \
         -not -path '*/.git/*' \
         -not -path '*/__pycache__/*' \
         -not -path '*/node_modules/*' \
-        ! -name "__init__.$ext" \
+        -not -path '*/.target/*' \
+        -not -name "__init__.py" \
         -exec printf "\n# ARQUIVO: %s\n" {} \; \
         -exec cat {} \; \
         | wl-copy
